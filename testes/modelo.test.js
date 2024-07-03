@@ -23,3 +23,37 @@ test('Testando cadastro de três perguntas', () => {
   expect(perguntas[2].num_respostas).toBe(0);
   expect(perguntas[1].id_pergunta).toBe(perguntas[2].id_pergunta-1);
 });
+
+test('Testando cadastro de resposta', () => {
+  const id_pergunta = modelo.cadastrar_pergunta('Qual a capital da França?');
+  const id_resposta = modelo.cadastrar_resposta(id_pergunta, 'Paris');
+  const respostas = modelo.get_respostas(id_pergunta);
+  expect(respostas.length).toBe(1);
+  expect(respostas[0].texto).toBe('Paris');
+});
+
+test('Testando obter pergunta', () => {
+  const id_pergunta = modelo.cadastrar_pergunta('Qual a capital da Espanha?');
+  const pergunta = modelo.get_pergunta(id_pergunta);
+  expect(pergunta.texto).toBe('Qual a capital da Espanha?');
+});
+
+test('Testando obter número de respostas', () => {
+  const id_pergunta = modelo.cadastrar_pergunta('Qual a capital da Itália?');
+  modelo.cadastrar_resposta(id_pergunta, 'Roma');
+  modelo.cadastrar_resposta(id_pergunta, 'Milão');
+  const num_respostas = modelo.get_num_respostas(id_pergunta);
+  expect(num_respostas).toBe(2);
+});
+
+test('Testando reconfiguração do banco de dados', () => {
+  const mock_bd = {
+    queryAll: jest.fn(() => []),
+    query: jest.fn(() => ({})),
+    exec: jest.fn(() => ({}))
+  };
+  modelo.reconfig_bd(mock_bd);
+  expect(mock_bd.queryAll).toHaveBeenCalledTimes(0);
+  modelo.listar_perguntas();
+  expect(mock_bd.queryAll).toHaveBeenCalledTimes(1);
+});
